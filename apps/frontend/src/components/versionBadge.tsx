@@ -14,7 +14,7 @@ export const VersionBadge = () => {
   }, []);
 
   return (
-    <div className='fixed bottom-2 right-2 flex gap-2 text-[10px] font-mono opacity-50 hover:opacity-100 transition-opacity'>
+    <div className='fixed bottom-2 left-2 flex gap-2 text-[10px] font-mono opacity-50 hover:opacity-100 transition-opacity'>
       <span className='bg-slate-800 text-slate-300 px-2 py-1 rounded'>UI: v{frontendVersion}</span>
       <span className='bg-slate-800 text-slate-300 px-2 py-1 rounded'>API: v{backendVersion}</span>
     </div>
