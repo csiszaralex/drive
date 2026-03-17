@@ -16,37 +16,31 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { AdminGuard } from 'src/common/admin.guard';
+import { UploadFileDto } from './dto/upload-file.dto';
 import { FilesService } from './files.service';
 import { multerConfig } from './multer.config';
 
-@Controller('storage')
+@Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
-  @Post('files')
+  @Post()
   @UseInterceptors(FilesInterceptor('files', 50, multerConfig))
   async uploadFiles(
     @UploadedFiles() files: Express.Multer.File[],
-    @Body('folderId') folderId?: string,
+    @Body() { folderId }: UploadFileDto,
   ) {
-    if (!files || files.length === 0) {
-      throw new BadRequestException('Nem érkeztek fájlok.');
-    }
+    if (!files || files.length === 0) throw new BadRequestException('Nem érkeztek fájlok.');
+
     return this.filesService.saveFiles(files, folderId);
   }
 
-  @Post('folders')
-  async createFolder(@Body('name') name: string, @Body('parentId') parentId?: string) {
-    if (!name) throw new BadRequestException('A mappa neve kötelező.');
-    return this.filesService.createFolder(name, parentId);
-  }
-
-  @Get('structure')
+  @Get()
   async getStructure(@Query('folderId') folderId?: string) {
     return this.filesService.getStructure(folderId);
   }
 
-  @Get('file/:id')
+  @Get(':id')
   async getFile(@Param('id', ParseUUIDPipe) id: string, @Res({ passthrough: true }) res: Response) {
     const { fileMetadata, stream } = await this.filesService.getFileStream(id);
 
@@ -65,17 +59,10 @@ export class FilesController {
     return stream;
   }
 
-  @Delete('files/:id')
+  @Delete(':id')
   @UseGuards(AdminGuard)
   async deleteFile(@Param('id', ParseUUIDPipe) id: string) {
     await this.filesService.deleteFile(id);
     return { success: true, message: 'Fájl törölve.' };
-  }
-
-  @Delete('folders/:id')
-  @UseGuards(AdminGuard)
-  async deleteFolder(@Param('id', ParseUUIDPipe) id: string) {
-    await this.filesService.deleteFolder(id);
-    return { success: true, message: 'Mappa és tartalma törölve.' };
   }
 }
