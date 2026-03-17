@@ -1,5 +1,6 @@
 import type { TGetStructureResponse } from '@repo/shared-types';
 import { useCallback, useEffect, useState } from 'react';
+import { apiClient } from '../lib/api';
 
 export function useStorage() {
   const [structure, setStructure] = useState<TGetStructureResponse>({ folders: [], files: [] });
@@ -11,12 +12,11 @@ export function useStorage() {
   const fetchStructure = useCallback(async () => {
     try {
       const url = currentFolderId
-        ? `${import.meta.env.VITE_API_URL}/files?folderId=${currentFolderId}`
-        : `${import.meta.env.VITE_API_URL}/files`;
+        ? `/files?folderId=${currentFolderId}`
+        : `/files`;
 
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('Hiba a lekérdezés során');
-      setStructure(await res.json());
+      const data = await apiClient<TGetStructureResponse>(url);
+      setStructure(data);
     } catch (error) {
       console.error(error);
     }
@@ -34,7 +34,7 @@ export function useStorage() {
     if (currentFolderId) formData.append('folderId', currentFolderId);
 
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/files`, { method: 'POST', body: formData });
+      await apiClient('/files', { method: 'POST', body: formData });
       fetchStructure();
     } finally {
       setIsUploading(false);
@@ -43,7 +43,7 @@ export function useStorage() {
 
   const createFolder = async (name: string) => {
     if (!name.trim()) return;
-    await fetch(`${import.meta.env.VITE_API_URL}/folders`, {
+    await apiClient('/folders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, parentId: currentFolderId }),
@@ -52,11 +52,10 @@ export function useStorage() {
   };
 
   const deleteItem = async (id: string, type: 'files' | 'folders', adminPass: string) => {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/${type}/${id}`, {
+    await apiClient(`/${type}/${id}`, {
       method: 'DELETE',
       headers: { 'x-admin-pass': adminPass },
     });
-    if (!res.ok) throw new Error('Sikertelen törlés (Hibás jelszó?)');
     fetchStructure();
   };
 
