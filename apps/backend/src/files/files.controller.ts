@@ -1,45 +1,52 @@
 import {
   BadRequestException,
+  Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
   Res,
-  UploadedFile,
+  UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
+import { AdminGuard } from 'src/common/admin.guard';
 import { FilesService } from './files.service';
 import { multerConfig } from './multer.config';
 
-@Controller('files')
+@Controller('storage')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
-  @Post()
-  @UseInterceptors(FileInterceptor('file', multerConfig))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    if (!file) {
-      throw new BadRequestException('Nem érkezett fájl.');
+  @Post('files')
+  @UseInterceptors(FilesInterceptor('files', 50, multerConfig))
+  async uploadFiles(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body('folderId') folderId?: string,
+  ) {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('Nem érkeztek fájlok.');
     }
-
-    const savedFile = await this.filesService.saveFile(file);
-
-    return {
-      id: savedFile.id,
-      originalName: savedFile.originalName,
-      size: savedFile.size,
-    };
+    return this.filesService.saveFiles(files, folderId);
   }
 
-  @Get()
-  async listFiles() {
-    return this.filesService.getAllFiles();
+  @Post('folders')
+  async createFolder(@Body('name') name: string, @Body('parentId') parentId?: string) {
+    if (!name) throw new BadRequestException('A mappa neve kötelező.');
+    return this.filesService.createFolder(name, parentId);
   }
 
-  @Get(':id')
+  @Get('structure')
+  async getStructure(@Query('folderId') folderId?: string) {
+    return this.filesService.getStructure(folderId);
+  }
+
+  @Get('file/:id')
   async getFile(@Param('id', ParseUUIDPipe) id: string, @Res({ passthrough: true }) res: Response) {
     const { fileMetadata, stream } = await this.filesService.getFileStream(id);
 
@@ -56,5 +63,19 @@ export class FilesController {
     });
 
     return stream;
+  }
+
+  @Delete('files/:id')
+  @UseGuards(AdminGuard)
+  async deleteFile(@Param('id', ParseUUIDPipe) id: string) {
+    await this.filesService.deleteFile(id);
+    return { success: true, message: 'Fájl törölve.' };
+  }
+
+  @Delete('folders/:id')
+  @UseGuards(AdminGuard)
+  async deleteFolder(@Param('id', ParseUUIDPipe) id: string) {
+    await this.filesService.deleteFolder(id);
+    return { success: true, message: 'Mappa és tartalma törölve.' };
   }
 }

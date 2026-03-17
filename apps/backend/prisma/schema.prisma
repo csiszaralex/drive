@@ -8,11 +8,23 @@ datasource db {
   provider = "postgresql"
 }
 
+model Folder {
+  id        String   @id @default(uuid())
+  name      String
+  parentId  String?
+  parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Folder[] @relation("FolderHierarchy")
+  files     File[]
+  createdAt DateTime @default(now())
+}
+
 model File {
   id           String   @id @default(uuid())
   originalName String
   mimeType     String
   size         Int
   path         String
+  folderId     String?
+  folder       Folder?  @relation(fields: [folderId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
 }

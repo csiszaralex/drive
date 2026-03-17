@@ -1,9 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { EarlyDataGuard } from './common/earlyData.guard';
+import { AppConfigService } from './configs/app-config.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(AppConfigService);
   app.useGlobalGuards(new EarlyDataGuard());
   app.enableCors({
     origin: '*',
@@ -11,7 +13,7 @@ async function bootstrap() {
     preflightContinue: false,
     optionsSuccessStatus: 204,
   });
-  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
+  await app.listen(configService.port, '0.0.0.0');
 }
 
 void bootstrap();

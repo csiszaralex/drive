@@ -5,6 +5,7 @@ export const envSchema = z.object({
   PORT: z.coerce.number().default(3000),
   APP_VERSION: z.string().default('0.0.0-dev'),
   DATABASE_URL: z.url(),
+  ADMIN_PASS: z.string().default('admin123'),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;
