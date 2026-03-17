@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: "{{URL}}/storage/file/0cc9f5cc-eff0-40d6-8f4f-fdad17115812"
+  url: "{{URL}}/storage/files/0cc9f5cc-eff0-40d6-8f4f-fdad17115812"
   auth: inherit
 
 settings:

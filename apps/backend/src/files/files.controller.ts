@@ -44,15 +44,38 @@ export class FilesController {
   async getFile(@Param('id', ParseUUIDPipe) id: string, @Res({ passthrough: true }) res: Response) {
     const { fileMetadata, stream } = await this.filesService.getFileStream(id);
 
-    const isInline =
-      fileMetadata.mimeType.startsWith('image/') || fileMetadata.mimeType.startsWith('text/');
+    const isImage = fileMetadata.mimeType.startsWith('image/');
+    const isMdOrJson =
+      fileMetadata.originalName.toLowerCase().endsWith('.md') ||
+      fileMetadata.originalName.toLowerCase().endsWith('.json') ||
+      fileMetadata.mimeType === 'application/json';
+
+    const isInline = isImage || fileMetadata.mimeType.startsWith('text/') || isMdOrJson;
+
     const dispositionType = isInline ? 'inline' : 'attachment';
 
     const encodedFileName = encodeURIComponent(fileMetadata.originalName);
 
+    // If it's markdown or json returning as inline, set content-type to text/plain to prevent browser from downloading or forcing a new external app page
+    const responseContentType = isMdOrJson && isInline ? 'text/plain' : fileMetadata.mimeType;
+
+    res.set({
+      'Content-Type': responseContentType,
+      'Content-Disposition': `${dispositionType}; filename*=UTF-8''${encodedFileName}`,
+      'X-Content-Type-Options': 'nosniff',
+    });
+
+    return stream;
+  }
+
+  @Get(':id/download')
+  async getFileDownload(@Param('id', ParseUUIDPipe) id: string, @Res({ passthrough: true }) res: Response) {
+    const { fileMetadata, stream } = await this.filesService.getFileStream(id);
+    const encodedFileName = encodeURIComponent(fileMetadata.originalName);
+
     res.set({
       'Content-Type': fileMetadata.mimeType,
-      'Content-Disposition': `${dispositionType}; filename*=UTF-8''${encodedFileName}`,
+      'Content-Disposition': `attachment; filename*=UTF-8''${encodedFileName}`,
       'X-Content-Type-Options': 'nosniff',
     });
 
