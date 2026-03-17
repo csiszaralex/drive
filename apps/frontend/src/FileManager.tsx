@@ -5,7 +5,7 @@ import FilePreviewDialog from './components/FilePreviewDialog';
 import StorageGrid from './components/StorageGrid';
 import StorageHeader from './components/StorageHeader';
 import { useStorage } from './hooks/useStorage';
-import type { FileItem } from './lib/types';
+import type { FileItem } from '@repo/shared-types';
 
 export default function FileManager() {
   const [adminPass, setAdminPass] = useState('');

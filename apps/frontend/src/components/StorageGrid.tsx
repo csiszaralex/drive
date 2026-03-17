@@ -1,17 +1,15 @@
-import type { FileItem, StorageStructure } from '@/lib/types';
 import { UploadCloud } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import ItemCard from './ItemCard';
+import type { FileItem, TGetStructureResponse } from '@repo/shared-types';
 
 interface StorageGridProps {
-  structure: StorageStructure;
+  structure: TGetStructureResponse;
   adminPass: string;
   onFolderDoubleClick: (id: string) => void;
   onFileDoubleClick: (file: FileItem) => void;
   onDelete: (id: string, type: 'files' | 'folders') => void;
 }
-
-const API_BASE = 'http://localhost:3001/storage';
 
 export default function StorageGrid({
   structure,
@@ -24,7 +22,7 @@ export default function StorageGrid({
 
   useEffect(() => {
     if (downloadFileId) {
-      window.location.href = `${API_BASE}/file/${downloadFileId}`;
+      window.location.href = `${import.meta.env.VITE_API_URL}/files/${downloadFileId}`;
     }
   }, [downloadFileId]);
 

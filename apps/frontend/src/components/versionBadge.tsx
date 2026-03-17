@@ -5,7 +5,7 @@ export const VersionBadge = () => {
   const frontendVersion = import.meta.env.VITE_APP_VERSION || '0.0.0-dev';
 
   useEffect(() => {
-    const baseUrl = import.meta.env.VITE_SOCKET_URL || '';
+    const baseUrl = import.meta.env.VITE_API_URL || '';
     const finalUrl = baseUrl === '/' ? '' : baseUrl;
     fetch(`${finalUrl}/health/version`)
       .then((res) => res.json())

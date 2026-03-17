@@ -13,6 +13,7 @@ const file = z.object({
   createdAt: z.date(),
   folderId: z.uuid().nullable(),
 });
+const fileWithoutFolderId = file.omit({ folderId: true });
 
 const folder = z.object({
   id: z.uuid(),
@@ -29,3 +30,4 @@ export const GetStructureResponseSchema = z.object({
   files: z.array(file.omit({ folderId: true })),
 });
 export type TGetStructureResponse = z.infer<typeof GetStructureResponseSchema>;
+export type FileItem = z.infer<typeof fileWithoutFolderId>;

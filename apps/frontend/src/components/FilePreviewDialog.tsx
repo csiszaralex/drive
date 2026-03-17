@@ -1,17 +1,15 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import type { FileItem } from '@/lib/types';
+import type { FileItem } from '@repo/shared-types';
 
 interface Props {
   file: FileItem | null;
   onClose: () => void;
 }
 
-const API_BASE = 'http://localhost:3001/storage';
-
 export default function FilePreviewDialog({ file, onClose }: Props) {
   if (!file) return null;
 
-  const fileUrl = `${API_BASE}/file/${file.id}`;
+  const fileUrl = `${import.meta.env.VITE_API_URL}/files/${file.id}`;
   const isImage = file.mimeType.startsWith('image/');
   const isText = file.mimeType.startsWith('text/');
 

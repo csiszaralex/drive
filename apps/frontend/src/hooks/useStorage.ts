@@ -1,10 +1,8 @@
-import type { StorageStructure } from '@/lib/types';
+import type { TGetStructureResponse } from '@repo/shared-types';
 import { useCallback, useEffect, useState } from 'react';
 
-const API_BASE = 'http://localhost:3001/storage';
-
 export function useStorage() {
-  const [structure, setStructure] = useState<StorageStructure>({ folders: [], files: [] });
+  const [structure, setStructure] = useState<TGetStructureResponse>({ folders: [], files: [] });
   const [folderHistory, setFolderHistory] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -13,8 +11,9 @@ export function useStorage() {
   const fetchStructure = useCallback(async () => {
     try {
       const url = currentFolderId
-        ? `${API_BASE}/structure?folderId=${currentFolderId}`
-        : `${API_BASE}/structure`;
+        ? `${import.meta.env.VITE_API_URL}/files?folderId=${currentFolderId}`
+        : `${import.meta.env.VITE_API_URL}/files`;
+
       const res = await fetch(url);
       if (!res.ok) throw new Error('Hiba a lekérdezés során');
       setStructure(await res.json());
@@ -35,7 +34,7 @@ export function useStorage() {
     if (currentFolderId) formData.append('folderId', currentFolderId);
 
     try {
-      await fetch(`${API_BASE}/files`, { method: 'POST', body: formData });
+      await fetch(`${import.meta.env.VITE_API_URL}/files`, { method: 'POST', body: formData });
       fetchStructure();
     } finally {
       setIsUploading(false);
@@ -44,7 +43,7 @@ export function useStorage() {
 
   const createFolder = async (name: string) => {
     if (!name.trim()) return;
-    await fetch(`${API_BASE}/folders`, {
+    await fetch(`${import.meta.env.VITE_API_URL}/folders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, parentId: currentFolderId }),
@@ -53,7 +52,7 @@ export function useStorage() {
   };
 
   const deleteItem = async (id: string, type: 'files' | 'folders', adminPass: string) => {
-    const res = await fetch(`${API_BASE}/${type}/${id}`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/${type}/${id}`, {
       method: 'DELETE',
       headers: { 'x-admin-pass': adminPass },
     });
