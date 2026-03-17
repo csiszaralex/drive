@@ -1,0 +1,18 @@
+info:
+  name: DeleteFolder
+  type: http
+  seq: 6
+
+http:
+  method: DELETE
+  url: "{{URL}}/storage/folders/38d5764a-17f9-4721-81fb-0f67ba0ad444"
+  headers:
+    - name: x-admin-pass
+      value: admin123
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

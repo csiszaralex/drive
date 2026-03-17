@@ -1,0 +1,20 @@
+info:
+  name: CreateFolder
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{URL}}/storage/folders"
+  body:
+    type: form-urlencoded
+    data:
+      - name: name
+        value: test
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

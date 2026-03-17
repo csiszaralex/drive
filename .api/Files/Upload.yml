@@ -1,0 +1,31 @@
+info:
+  name: Upload
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{URL}}/storage/files"
+  body:
+    type: multipart-form
+    data:
+      - name: files
+        type: file
+        value:
+          - P:\01_Fullstack\drive\README.md
+        contentType: text/plain
+      - name: files
+        type: file
+        value:
+          - P:\01_Fullstack\drive\pnpm-workspace.yaml
+        contentType: text/plain
+      - name: folderId
+        type: text
+        value: 38d5764a-17f9-4721-81fb-0f67ba0ad444
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,20 @@
+info:
+  name: GetStructure
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{URL}}/storage/structure"
+  params:
+    - name: folderId
+      value: 38d5764a-17f9-4721-81fb-0f67ba0ad444
+      type: query
+      disabled: true
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
