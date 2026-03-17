@@ -40,3 +40,6 @@ lerna-debug.log*
 *.local
 .DS_Store
 *.pem
+
+# Generated files
+**/generated/**
