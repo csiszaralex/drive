@@ -6,6 +6,7 @@ export const envSchema = z.object({
   APP_VERSION: z.string().default('0.0.0-dev'),
   DATABASE_URL: z.url(),
   ADMIN_PASS: z.string().default('admin123'),
+  SWAGGER_ENABLED: z.coerce.boolean().default(false),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;
