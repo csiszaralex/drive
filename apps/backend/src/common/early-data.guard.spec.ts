@@ -1,5 +1,5 @@
 import { ExecutionContext, HttpException } from '@nestjs/common';
-import { EarlyDataGuard } from './earlyData.guard';
+import { EarlyDataGuard } from './early-data.guard';
 
 describe('EarlyDataGuard', () => {
   let guard: EarlyDataGuard;

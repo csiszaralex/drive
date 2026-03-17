@@ -7,6 +7,6 @@ import { PrismaService } from './prisma.service';
 @Module({
   imports: [AppConfigModule, FilesModule],
   controllers: [AppController],
-  providers: [PrismaService],
+  providers: [PrismaService, { provide: APP_FILTER, useClass: GlobalExceptionFilter }],
 })
 export class AppModule {}
