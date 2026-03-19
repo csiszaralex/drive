@@ -1,5 +1,11 @@
 # backend
 
+## 1.0.2
+
+### Patch Changes
+
+- 55c6126: fix deploy
+
 ## 1.0.1
 
 ### Patch Changes
