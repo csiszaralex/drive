@@ -25,8 +25,10 @@ RUN corepack enable
 
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
-# Itt CSAK a production dependency-ket telepítjük
+
 RUN pnpm install --prod --ignore-scripts --frozen-lockfile --config.node-linker=hoisted
+COPY --from=pruner /app/out/full/apps/backend/prisma ./apps/backend/prisma
+RUN pnpm dlx prisma generate --schema=apps/backend/prisma/schema.prisma
 
 # --- 4. RUNNER STAGE ---
 FROM node:24-alpine AS runner

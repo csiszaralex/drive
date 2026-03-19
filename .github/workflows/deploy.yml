@@ -127,7 +127,7 @@ jobs:
             sleep 3
 
             echo "Running database migrations..."
-            docker compose run --rm backend npx prisma migrate deploy
+            docker compose run --rm backend pnpm dlx prisma migrate deploy
           fi
 
           docker compose up -d --remove-orphans ${{ needs.build-and-push.outputs.service }} db
