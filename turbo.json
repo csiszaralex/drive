@@ -5,23 +5,23 @@
       "cache": false,
       "persistent": true
     },
-    "build": {
-      "dependsOn": ["^build", "^db:generate"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "public/**", "dist/**"]
-    },
     "db:generate": {
       "inputs": ["prisma/schema.prisma"],
       "outputs": ["src/generated/**"]
     },
+    "build": {
+      "dependsOn": ["^build", "^db:generate", "db:generate"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**", "public/**", "dist/**"]
+    },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint", "db:generate"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^check-types", "db:generate"]
     },
     "test": {
-      "dependsOn": ["^build", "^db:generate"],
+      "dependsOn": ["^build", "^db:generate", "db:generate"],
       "outputs": ["coverage/**"],
       "inputs": ["src/**/*.ts", "test/**/*.ts"]
     }
