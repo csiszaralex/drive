@@ -22,12 +22,20 @@ export default function StorageGrid({
 
   useEffect(() => {
     if (downloadFileId) {
-      window.location.href = `${import.meta.env.VITE_API_URL}/files/${downloadFileId}`;
+      window.location.href = `${import.meta.env.VITE_API_URL}/files/${downloadFileId}/download`;
+      // Reset after a short delay so the user can click it again if needed
+      setTimeout(() => setDownloadFileId(null), 100);
     }
   }, [downloadFileId]);
 
   const handleFileAction = (file: FileItem) => {
-    const isPreviewable = file.mimeType.startsWith('image/') || file.mimeType.startsWith('text/');
+    const isMdOrJson =
+      file.originalName.toLowerCase().endsWith('.md') ||
+      file.originalName.toLowerCase().endsWith('.json') ||
+      file.mimeType === 'application/json';
+
+    const isPreviewable =
+      file.mimeType.startsWith('image/') || file.mimeType.startsWith('text/') || isMdOrJson;
 
     if (isPreviewable) {
       onFileDoubleClick(file);

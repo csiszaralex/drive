@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, Lock, Plus } from 'lucide-react';
+import { ArrowLeft, Lock, Plus, UploadCloud } from 'lucide-react';
 import { useState } from 'react';
 
 interface Props {
@@ -9,6 +9,7 @@ interface Props {
   onCreateFolder: (name: string) => Promise<void>;
   adminPass: string;
   setAdminPass: (val: string) => void;
+  onUploadClick: () => void;
 }
 
 export default function StorageHeader({
@@ -17,6 +18,7 @@ export default function StorageHeader({
   onCreateFolder,
   adminPass,
   setAdminPass,
+  onUploadClick,
 }: Props) {
   const [folderName, setFolderName] = useState('');
 
@@ -37,12 +39,18 @@ export default function StorageHeader({
         >
           <ArrowLeft className='h-4 w-4' />
         </Button>
-        <h1 className='text-lg font-medium'>Storage</h1>
+        <h1 className='text-lg font-medium hidden sm:block'>Storage</h1>
+        <Button size='sm' onClick={onUploadClick} className='bg-blue-600 hover:bg-blue-700 text-white ml-2'>
+          <UploadCloud className='h-4 w-4 mr-2' /> Feltöltés
+        </Button>
       </div>
 
       <div className='flex items-center gap-4'>
         <div className='flex items-center gap-2'>
           <Input
+            name='newFolderName'
+            id='newFolderName'
+            autoComplete='off'
             value={folderName}
             onChange={(e) => setFolderName(e.target.value)}
             placeholder='Új mappa neve...'
@@ -57,6 +65,10 @@ export default function StorageHeader({
           <Lock className='h-4 w-4 absolute left-2.5 top-2.5 text-zinc-500' />
           <Input
             type='password'
+            name='adminPassword'
+            id='adminPassword'
+            autoComplete='new-password'
+            data-lpignore='true'
             placeholder='Admin jelszó'
             value={adminPass}
             onChange={(e) => setAdminPass(e.target.value)}

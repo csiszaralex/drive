@@ -5,10 +5,10 @@ info:
 
 http:
   method: GET
-  url: "{{URL}}/storage/structure"
+  url: "{{URL}}/files"
   params:
     - name: folderId
-      value: 38d5764a-17f9-4721-81fb-0f67ba0ad444
+      value: d1a503ad-bf09-4116-ae28-a77a16442b9ba
       type: query
       disabled: true
   auth: inherit

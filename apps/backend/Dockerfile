@@ -1,12 +1,12 @@
 # --- 1. PRUNER STAGE ---
-FROM node:22-alpine AS pruner
+FROM node:24-alpine AS pruner
 WORKDIR /app
 RUN npm install -g turbo
 COPY . .
 RUN turbo prune --scope=backend --docker
 
 # --- 2. BUILDER STAGE (DevDeps + Build) ---
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 # Corepack enable jobb practice, mint az npm install -g pnpm, de így is oké
 RUN corepack enable
@@ -19,17 +19,17 @@ RUN pnpm turbo build --filter=backend...
 
 # --- 3. INSTALLER STAGE (Csak ProdDeps) ---
 # Ez az új köztes lépés kritikus a méretcsökkentéshez!
-FROM node:22-alpine AS installer
+FROM node:24-alpine AS installer
 WORKDIR /app
 RUN corepack enable
 
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 # Itt CSAK a production dependency-ket telepítjük
-RUN pnpm install --only=production --ignore-scripts --frozen-lockfile --config.node-linker=hoisted
+RUN pnpm install --prod --ignore-scripts --frozen-lockfile --config.node-linker=hoisted
 
 # --- 4. RUNNER STAGE ---
-FROM node:22-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 
 ARG APP_VERSION
@@ -55,4 +55,4 @@ ENV PORT=3000
 
 # dumb-init entrypoint a tiszta leállásért
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD ["node", "dist/main"]
+CMD ["node", "dist/main.js"]

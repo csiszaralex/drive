@@ -6,6 +6,7 @@ import StorageGrid from './components/StorageGrid';
 import StorageHeader from './components/StorageHeader';
 import { useStorage } from './hooks/useStorage';
 import type { FileItem } from '@repo/shared-types';
+import { ApiError } from './lib/api';
 
 export default function FileManager() {
   const [adminPass, setAdminPass] = useState('');
@@ -17,8 +18,13 @@ export default function FileManager() {
       await storage.uploadFiles(files);
       toast.success('Sikeres feltöltés', { description: `${files.length} fájl feltöltve.` });
     } catch (error) {
-      if (error instanceof Error)
+      if (error instanceof ApiError) {
         toast.error('Hiba a feltöltésnél', { description: error.message });
+      } else if (error instanceof Error) {
+        toast.error('Hiba a feltöltésnél', { description: error.message });
+      } else {
+        toast.error('Ismeretlen hiba a feltöltésnél');
+      }
     }
   };
 
@@ -32,21 +38,32 @@ export default function FileManager() {
         description: `A ${type === 'files' ? 'fájl' : 'mappa'} sikeresen törölve.`,
       });
     } catch (error) {
-      if (error instanceof Error) toast.error('Hiba a törlésnél', { description: error.message });
+      if (error instanceof ApiError) {
+        toast.error('Hiba a törlésnél', { description: error.message });
+      } else if (error instanceof Error) {
+        toast.error('Hiba a törlésnél', { description: error.message });
+      } else {
+        toast.error('Ismeretlen hiba a törlésnél');
+      }
     }
   };
 
   return (
     <>
-      <StorageHeader
-        onBack={storage.goBack}
-        canGoBack={storage.canGoBack}
-        onCreateFolder={storage.createFolder}
-        adminPass={adminPass}
-        setAdminPass={setAdminPass}
-      />
-
-      <DropzoneArea onUpload={handleUpload} isUploading={storage.isUploading}>
+      <DropzoneArea 
+        onUpload={handleUpload} 
+        isUploading={storage.isUploading}
+        renderHeader={(open) => (
+          <StorageHeader
+            onBack={storage.goBack}
+            canGoBack={storage.canGoBack}
+            onCreateFolder={storage.createFolder}
+            adminPass={adminPass}
+            setAdminPass={setAdminPass}
+            onUploadClick={open}
+          />
+        )}
+      >
         <StorageGrid
           structure={storage.structure}
           adminPass={adminPass}

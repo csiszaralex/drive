@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react';
+import { apiClient } from '@/lib/api';
 
 export const VersionBadge = () => {
   const [backendVersion, setBackendVersion] = useState<string>('loading...');
   const frontendVersion = import.meta.env.VITE_APP_VERSION || '0.0.0-dev';
 
   useEffect(() => {
-    const baseUrl = import.meta.env.VITE_API_URL || '';
-    const finalUrl = baseUrl === '/' ? '' : baseUrl;
-    fetch(`${finalUrl}/health/version`)
-      .then((res) => res.json())
-      .then((data) => setBackendVersion(data.version))
-      .catch(() => setBackendVersion('offline'));
+    const fetchVersion = async () => {
+      try {
+        const data = await apiClient<{ version: string }>('/health/version');
+        setBackendVersion(data.version);
+      } catch {
+        setBackendVersion('offline');
+      }
+    };
+
+    void fetchVersion();
   }, []);
 
   return (

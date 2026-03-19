@@ -9,6 +9,7 @@ import { AppConfigService } from './configs/app-config.service';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(AppConfigService);
+  app.setGlobalPrefix('api');
   app.useGlobalPipes(new ZodValidationPipe());
   app.useGlobalGuards(new EarlyDataGuard());
   app.enableCors({
