@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-mydb}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  backend:
+    image: ghcr.io/${IMAGE_NAME:-csiszaralex/drive}-backend:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_started
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-mydb}
+      - ADMIN_PASS=${ADMIN_PASS}
+      - SWAGGER_ENABLED=false
+    networks:
+      - app-network
+
+  frontend:
+    image: ghcr.io/${IMAGE_NAME:-csiszaralex/drive}-frontend:latest
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - app-network
+      - proxy_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.drive-app.rule=Host(`drive.csalex.dev`)"
+      - "traefik.http.routers.drive-app.entrypoints=websecure"
+      - "traefik.http.routers.drive-app.tls.certresolver=myresolver"
+      - "traefik.http.services.drive-app.loadbalancer.server.port=80"
+      - "traefik.docker.network=proxy_network"
+
+networks:
+  app-network:
+    driver: bridge
+  proxy_network:
+    external: true
+
+volumes:
+  pgdata:

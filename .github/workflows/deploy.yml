@@ -85,7 +85,6 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: self-hosted
-    # environment: production
 
     steps:
       - name: Checkout repository
@@ -99,16 +98,38 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy to VPS
+        env:
+          ADMIN_PASS: ${{ secrets.ADMIN_PASS }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_USER: ${{ vars.POSTGRES_USER || 'postgres' }}
+          POSTGRES_DB: ${{ vars.POSTGRES_DB || 'mydb' }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
         run: |
           echo "Deploying ${{ needs.build-and-push.outputs.service }} version ${{ needs.build-and-push.outputs.version }}..."
 
-          # Csak a frissült képet húzzuk le (hatékonyabb)
-          # A docker compose pull alapból a 'latest' taget keresi a yaml alapján,
-          # amit az előző jobban frissítettünk.
+          REPO="${{ github.repository }}"
+          IMAGE_NAME="${REPO,,}"
+
+          cat <<EOF > .env
+          ADMIN_PASS=$ADMIN_PASS
+          POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+          POSTGRES_USER=$POSTGRES_USER
+          POSTGRES_DB=$POSTGRES_DB
+          IMAGE_NAME=$IMAGE_NAME
+          EOF
+
           docker compose pull ${{ needs.build-and-push.outputs.service }}
 
-          # Újraindítjuk a konténereket
-          docker compose up -d --remove-orphans ${{ needs.build-and-push.outputs.service }}
+          if [ "${{ needs.build-and-push.outputs.service }}" == "backend" ]; then
+            echo "Starting database explicitly..."
+            docker compose up -d db
 
-          # Takarítás
+            sleep 3
+
+            echo "Running database migrations..."
+            docker compose run --rm backend npx prisma migrate deploy
+          fi
+
+          docker compose up -d --remove-orphans ${{ needs.build-and-push.outputs.service }} db
           docker image prune -f
+          rm .env
