@@ -37,17 +37,16 @@ WORKDIR /app
 ARG APP_VERSION
 ENV APP_VERSION=$APP_VERSION
 
-# Senior tipp: dumb-init használata a Node process signal handling (SIGTERM) miatt
-RUN apk add --no-cache libc6-compat dumb-init
+RUN apk add --no-cache libc6-compat dumb-init \
+  && corepack enable
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nodejs
 
-# Csak a szükséges fájlokat másoljuk át rétegenként
 COPY --from=installer --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/apps/backend/dist ./dist
-# Opcionális: package.json, ha az alkalmazás olvassa futásidőben verziószám miatt
 COPY --from=builder --chown=nodejs:nodejs /app/apps/backend/package.json ./package.json
+COPY --from=builder --chown=nodejs:nodejs /app/apps/backend/prisma ./apps/backend/prisma
 
 USER nodejs
 
