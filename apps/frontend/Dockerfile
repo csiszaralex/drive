@@ -1,5 +1,5 @@
 # --- 1. PRUNER STAGE ---
-FROM node:22-alpine AS pruner
+FROM node:24-alpine AS pruner
 WORKDIR /app
 RUN npm install -g turbo
 COPY . .
@@ -7,7 +7,7 @@ COPY . .
 RUN turbo prune --scope=frontend --docker
 
 # --- 2. BUILDER STAGE ---
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 RUN corepack enable
 
@@ -24,7 +24,7 @@ COPY --from=pruner /app/out/full/ .
 # A "Build Once, Deploy Anywhere" elv miatt a relatív URL (proxy) a legjobb megoldás.
 ARG VITE_APP_VERSION
 ENV VITE_APP_VERSION=$VITE_APP_VERSION
-ENV VITE_SOCKET_URL=/
+ENV VITE_API_URL=/api
 
 # A turbo build automatikusan felismeri a topológiát (hogy a shared-types kell a frontendnek)
 # Nem kell külön buildelni a dependenciákat manuálisan.

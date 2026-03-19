@@ -69,7 +69,10 @@ export class FilesController {
   }
 
   @Get(':id/download')
-  async getFileDownload(@Param('id', ParseUUIDPipe) id: string, @Res({ passthrough: true }) res: Response) {
+  async getFileDownload(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const { fileMetadata, stream } = await this.filesService.getFileStream(id);
     const encodedFileName = encodeURIComponent(fileMetadata.originalName);
 
