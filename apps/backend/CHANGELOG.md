@@ -1,5 +1,11 @@
 # backend
 
+## 1.0.1
+
+### Patch Changes
+
+- a56887a: Fix deploy
+
 ## 1.0.0
 
 ### Major Changes
