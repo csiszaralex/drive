@@ -1,5 +1,11 @@
 # backend
 
+## 1.0.3
+
+### Patch Changes
+
+- f422c38: fix deploy
+
 ## 1.0.2
 
 ### Patch Changes
