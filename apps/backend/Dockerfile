@@ -26,7 +26,7 @@ RUN corepack enable
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 
-RUN pnpm install --prod --ignore-scripts --frozen-lockfile --config.node-linker=hoisted
+RUN pnpm install --prod --frozen-lockfile --config.node-linker=hoisted
 COPY --from=pruner /app/out/full/apps/backend/prisma ./apps/backend/prisma
 RUN pnpm dlx prisma generate --schema=apps/backend/prisma/schema.prisma
 
